@@ -2,4 +2,5 @@
 .github/
 .vscode/
 .firebase/
+.DS_Store
 firebase-debug.log
