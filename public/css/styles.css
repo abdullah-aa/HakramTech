@@ -1,16 +1,12 @@
 body {
     font-family: fantasy;
-    background: black;
     color: lawngreen;
+    background-image: url("../assets/digital_rain.gif");
 }
 
 header {
-    display: flex;
-    justify-content: space-between;
-
-    padding-top: 0.25rem;
-    margin-bottom: 1rem;
-    border-bottom: 0.25rem solid lightslategray;
+    padding-top: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .title {
@@ -19,9 +15,21 @@ header {
 
 .row {
     display: flex;
-    justify-content: space-between;
 
     padding: 0.5rem;
+    margin: 0.5rem 0;
+
+    background: black;
+    opacity: 1;
+}
+
+.row-right {
+    border: 1px solid violet;
+}
+
+.row-left {
+    flex-direction: row-reverse;
+    border: 1px solid orange;
 }
 
 .row-image {
@@ -39,10 +47,4 @@ header {
 .linkColor {
     text-decoration: none;
     color: yellow !important;
-    transition: color 0.5s ease-in;
-}
-
-.linkColor:hover {
-    color: coral !important;
-    transition: color 0.5s ease-in;
 }
