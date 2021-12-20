@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>hakrAm | 🔴 💊</title>
+
+    <link rel="stylesheet" href="css/news.css" />
+    <link rel="shortcut icon" type="image/png" href="assets/favicon.webp">
+  </head>
+  <body>
+    <header>
+      <marquee class="title" behavior="alternate">welcome, hakr</marquee>
+    </header>
+    <div class="mainImageContainer"></div>
+    <div class="row row-violet">
+      <div class="row-text">
+        <a class="linkColor" href="https://www.wsj.com/articles/defending-mathematics-science-stem-equity-education-california-k12-math-matters-11638728196" target="_blank">
+          Squaring Up to Defend Mathematics
+        </a>
+      </div>
+    </div>
+    <div class="row row-orange">
+      <div class="row-text">
+        <a class="linkColor" href="https://restofworld.org/2021/didi-forced-to-delist-is-alibaba-next/" target="_blank">
+          China forced DiDi off a U.S. stock exchange. Who’s next?
+        </a>
+      </div>
+    </div>
+    <div class="row row-violet">
+      <div class="row-text">
+        <a class="linkColor" href="https://console.substack.com/p/console-82" target="_blank">
+          Console #82 -- RosettaBoy, Fosscord, and Shisho
+        </a>
+      </div>
+    </div>
+    <div class="row row-orange">
+      <div class="row-text">
+        <a class="linkColor" href="https://partee.io/2021/12/05/coding-jams/" target="_blank">
+          Coding Jams: Playlists for the Daily Grind
+        </a>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      const MAX_TECH = 4;
+
+      let imageElement = document.createElement('img');
+      imageElement.src = `assets/tech_${getRandomInt(MAX_TECH)}.gif`;
+      imageElement.classList.add('mainImage');
+
+      let imageContainer = document.getElementsByClassName('mainImageContainer')[0];
+      imageContainer.append(imageElement);
+
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+      }
+    </script>
+  </body>
+</html>
