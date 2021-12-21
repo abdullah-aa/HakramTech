@@ -23,7 +23,6 @@ body {
     margin-top: 2rem;
     display: flex;
     justify-content: space-around;
-    padding: 0.25rem;
     border: 0.25rem solid forestgreen;
 }
 
@@ -35,6 +34,6 @@ body {
     background-color: yellow;
 }
 
-.touched {
-    background-color: purple !important;
+.purple {
+    background-color: purple;
 }
