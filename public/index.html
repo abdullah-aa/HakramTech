@@ -14,36 +14,22 @@
       <br>
       <sub>... they're Great! ⛈️</sub>
     </header>
-    
-    <div class="createBlock thread">
-      <div>Create a new thread...</div>
-      <div class="createControls">
-        <div class="contentAndPoster">
-          <textarea id="content" maxlength="100"></textarea>
-          <input id="poster" type="text" placeholder="Poster" />
-        </div>
-        <button id="threadSubmit">Create</button>
-      </div>
-    </div>
 
     <div id="threads">
-      <div class="thread">
-        <div>Mundane topic</div>
-        <div class="metadata">
-          <div>notThatGreat</div>
-          <div>on June 01, at 19:23</div>
+      <div class="createBlock thread">
+        <div>Create a new thread...</div>
+        <div class="createControls">
+          <div class="contentAndPoster">
+            <textarea id="title" maxlength="50" placeholder="Max 50 chars."></textarea>
+            <input id="author" type="text" placeholder="Author" />
+          </div>
+          <button id="threadSubmit">Create</button>
         </div>
       </div>
-      <div class="thread">
-        <div>Also boring</div>
-        <div class="metadata">
-          <div>sadState</div>
-          <div>on May 30, at 11:10</div>
-        </div>
-      </div>
+      <div id="threadList"></div>
     </div>
 
-    <div id="threadExpanded">
+    <div id="threadAndPosts" class="hidden">
       <div class="thread">
         <div>Full blown essay on a very, very mundane chapter of Alex's long, eventful life.</div>
         <div class="metadata">
@@ -51,31 +37,98 @@
           <div>on June 01, at 19:23</div>
         </div>
       </div>
-      <div class="post">
-        <div>Said something back, what was it?</div>
-        <div class="metadata">
-          <div>justAsWorse</div>
-          <div>on June 01, at 20:03</div>
+      <div id="posts">
+        <div class="post">
+          <div>Said something back, what was it?</div>
+          <div class="metadata">
+            <div>justAsWorse</div>
+            <div>on June 01, at 20:03</div>
+          </div>
+        </div>
+        <div class="post">
+          <div>And so began a conversation</div>
+          <div class="metadata">
+            <div>notGettingBetter</div>
+            <div>on June 01, at 22:15</div>
+          </div>
         </div>
       </div>
-      <div class="post">
-        <div>And so began a conversation</div>
-        <div class="metadata">
-          <div>notGettingBetter</div>
-          <div>on June 01, at 22:15</div>
+      <div class="createBlock post">
+        <div>Create a new post...</div>
+        <div class="createControls">
+          <div class="contentAndPoster">
+            <textarea id="post" maxlength="100" placeholder="Max 100 chars."></textarea>
+            <input id="poster" type="text" maxlength="23" placeholder="Poster" />
+          </div>
+          <button id="threadSubmit">Create</button>
         </div>
       </div>
     </div>
 
-    <div class="createBlock post">
-      <div>Create a new post...</div>
-      <div class="createControls">
-        <div class="contentAndPoster">
-          <textarea id="content" maxlength="100"></textarea>
-          <input id="poster" type="text" placeholder="Poster" />
-        </div>
-        <button id="threadSubmit">Create</button>
-      </div>
-    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyCQGOCnq-0gV5SI2tnJ9tG9U9MNcCDT0C4",
+        authDomain: "hakram-tech.firebaseapp.com",
+        projectId: "hakram-tech",
+        databaseURL: "https://hakram-tech-default-rtdb.firebaseio.com/",
+        storageBucket: "hakram-tech.appspot.com",
+        messagingSenderId: "1012316248903",
+        appId: "1:1012316248903:web:d78971e9efa6a494b58a62",
+        measurementId: "G-MGYPVF5H42"
+      };
+
+      const HUMAN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const convertUnixTimestamp = timestamp => {
+        let dateObj = new Date();
+        dateObj.setTime(timestamp);
+        return `on ${HUMAN_MONTHS[dateObj.getMonth - 1]} ${dateObj.getDate()}, at ${dateObj.getHours()}:${dateObj.getMinutes()}`;
+      }
+
+      const firebaseApp = firebase.initializeApp(firebaseConfig);
+      const db = firebaseApp.database();
+
+      const titleInput = document.getElementById('title');
+      const authorInput = document.getElementById('author');
+
+      const threadList = document.getElementById('threadList');
+      const threads_ref = db.ref('threads').orderByChild('updatedAt').on('value', snaspshot => {
+        threadList.innerHTML = '';
+        let sortedThreads = Object.values(snaspshot.val()).reverse();
+        sortedThreads.forEach(thread => {
+          let threadDate = 
+          threadList.innerHTML += `
+            <div class="thread">
+              <div>${thread.title}</div>
+              <div class="metadata">
+                <div>${thread.author}</div>
+                <div>${convertUnixTimestamp(thread.updatedAt)}</div>
+              </div>
+            </div>
+          `;
+        });
+      });
+
+      document.getElementById("threadSubmit").addEventListener('click', () => {
+        let title = titleInput.value.trim();
+
+        if (!title) {
+          alert('Thread Title can\'t be blank!');
+          return;
+        }
+
+        let threadID = `${Math.random()}`.substring(2)
+        db.ref(`threads/${threadID}`).set({
+          id: threadID,
+          title: title,
+          author: authorInput.value.trim() || 'anonymous',
+          updatedAt: (new Date()).getTime(),
+        });
+
+        alert("Thread submitted for creation!");
+        titleInput.value = "";
+      });
+    </script>
   </body>
 </html>

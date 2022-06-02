@@ -61,5 +61,5 @@ header {
 }
 
 .hidden {
-    visibility: hidden !important;
+    display: none;
 }
