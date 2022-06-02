@@ -83,7 +83,9 @@
       const convertUnixTimestamp = timestamp => {
         let dateObj = new Date();
         dateObj.setTime(timestamp);
-        return `on ${HUMAN_MONTHS[dateObj.getMonth - 1]} ${dateObj.getDate()}, at ${dateObj.getHours()}:${dateObj.getMinutes()}`;
+        let minutes = dateObj.getMinutes();
+        let updatedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        return `on ${HUMAN_MONTHS[dateObj.getMonth() - 1]} ${dateObj.getDate()}, at ${dateObj.getHours()}:${updatedMinutes}`;
       }
 
       const firebaseApp = firebase.initializeApp(firebaseConfig);
@@ -93,9 +95,15 @@
       const authorInput = document.getElementById('author');
 
       const threadList = document.getElementById('threadList');
-      const threads_ref = db.ref('threads').orderByChild('updatedAt').on('value', snaspshot => {
+      const threads_ref = db.ref('threads').on('value', snaspshot => {
         threadList.innerHTML = '';
-        let sortedThreads = Object.values(snaspshot.val()).reverse();
+        let snaspshot_value = snaspshot.val();
+        if (!snaspshot_value) { return; }
+
+
+        let sortedThreads = Object.values(snaspshot_value).sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt));
+        console.log(snaspshot_value);
+        console.log(sortedThreads);
         sortedThreads.forEach(thread => {
           let threadDate = 
           threadList.innerHTML += `
