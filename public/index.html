@@ -15,7 +15,16 @@
       <sub>... they're Great! ⛈️</sub>
     </header>
     
-    <div id="createThread"></div>
+    <div class="createBlock thread">
+      <div>Create a new thread...</div>
+      <div class="createControls">
+        <div class="contentAndPoster">
+          <textarea id="content" maxlength="100"></textarea>
+          <input id="poster" type="text" placeholder="Poster" />
+        </div>
+        <button id="threadSubmit">Create</button>
+      </div>
+    </div>
 
     <div id="threads">
       <div class="thread">
@@ -36,7 +45,7 @@
 
     <div id="threadExpanded">
       <div class="thread">
-        <div>Mundane topic</div>
+        <div>Full blown essay on a very, very mundane chapter of Alex's long, eventful life.</div>
         <div class="metadata">
           <div>notThatGreat</div>
           <div>on June 01, at 19:23</div>
@@ -58,6 +67,15 @@
       </div>
     </div>
 
-    <div id="createPost"></div>
+    <div class="createBlock post">
+      <div>Create a new post...</div>
+      <div class="createControls">
+        <div class="contentAndPoster">
+          <textarea id="content" maxlength="100"></textarea>
+          <input id="poster" type="text" placeholder="Poster" />
+        </div>
+        <button id="threadSubmit">Create</button>
+      </div>
+    </div>
   </body>
 </html>

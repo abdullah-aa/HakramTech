@@ -2,8 +2,8 @@ body {
     font-family: fantasy;
     background-image: url("../assets/great_background.png");
     padding: 0.5rem;
+    opacity: 0.8;
 }
-
 
 header {
     box-shadow: 0 0 5px 10px orangered;
@@ -15,9 +15,32 @@ header {
     text-align: center;
 }
 
+.createBlock {
+    font-weight: bold;
+}
+
+.createControls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.createControls button {
+    height: 1.5rem;
+}
+
+.createControls .contentAndPoster {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+}
+
+.contentAndPoster input {
+    margin-top: 0.2rem;
+}
+
 .thread {
     background-color: blanchedalmond;
-    opacity: 0.8;
     box-shadow: 0 0 5px 10px palegoldenrod;
     margin: 2rem 0.5rem;
     padding: 0.5rem;
@@ -32,7 +55,6 @@ header {
 
 .post {
     background-color: paleturquoise;
-    opacity: 0.8;
     box-shadow: 0 0 3px 5px aquamarine;
     margin: 1rem 0.8rem;
     padding: 0.5rem;
