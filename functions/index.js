@@ -32,12 +32,14 @@ exports.createPost = functions.https.onRequest(async(request, response) => {
 
 exports.createThread = functions.https.onRequest(async(request, response) => {
   const threadID = Math.random().toString().substring(2);
+  const timestamp = (new Date()).getTime();
   functions.logger.info(`Thread creation request`, {structuredData: true});
   admin.database().ref(`threads/${threadID}`).set({
     title: request.query.title,
-    threadID: threadID,
+    id: threadID,
     author: request.query.author || 'anonymous',
-    updatedAt: (new Date()).getTime(),
+    updatedAt: timestamp,
+    createdAt: timestamp
   });
   response.json({ result: `Thread ID#${threadID} created.`});
 });

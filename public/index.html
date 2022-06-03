@@ -18,10 +18,11 @@
     <div id="threads">
       <div class="createBlock thread">
         <div>Create a new thread...</div>
+        <div id="threadError" class="errorMessage hidden"></div>
         <div class="createControls">
           <div class="contentAndPoster">
-            <textarea id="title" maxlength="50" placeholder="Max 50 chars."></textarea>
-            <input id="author" type="text" placeholder="Author" />
+            <textarea id="title" maxlength="100" placeholder="Max 100 chars."></textarea>
+            <input id="author" type="text" placeholder="Author - default 'anonymous'" />
           </div>
           <button id="threadSubmit">Create</button>
         </div>
@@ -40,10 +41,11 @@
       <div id="posts"></div>
       <div class="createBlock post">
         <div>Create a new post...</div>
+        <div id="postError" class="errorMessage hidden"></div>
         <div class="createControls">
           <div class="contentAndPoster">
-            <textarea id="post" maxlength="100" placeholder="Max 100 chars."></textarea>
-            <input id="poster" type="text" maxlength="23" placeholder="Poster" />
+            <textarea id="post" maxlength="150" placeholder="Max 150 chars."></textarea>
+            <input id="poster" type="text" maxlength="23" placeholder="Poster - default 'anonymous'" />
           </div>
           <button id="postSubmit">Post</button>
         </div>
@@ -57,18 +59,23 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
       const firebaseConfig = {
-        // TODO - Add keys before deployment!
+        
       };
 
       const HUMAN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const convertUnixTimestamp = timestamp => {
         let dateObj = new Date();
-        dateObj.setTime(timestamp);news ? `0${minutes}` : minutes;
-        return `on ${HUMAN_MONTHS[dateObj.getMonth() - 1]} ${dateObj.getDate()}, at ${dateObj.getHours()}:${updatedMinutes}`;
+        dateObj.setTime(timestamp);
+        let minutes = dateObj.getMinutes();
+        let updatedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        return `${dateObj.getHours()}:${updatedMinutes}, on ${HUMAN_MONTHS[dateObj.getMonth() - 1]} ${dateObj.getDate()}`;
       }
 
       const firebaseApp = firebase.initializeApp(firebaseConfig);
       const db = firebaseApp.database();
+
+      const threadError = document.getElementById('threadError');
+      const postError = document.getElementById('postError');
 
       const titleInput = document.getElementById('title');
       const authorInput = document.getElementById('author');
@@ -82,15 +89,23 @@
       const threadAndPosts = document.getElementById('threadAndPosts');
       const expandedThread = document.getElementById('expandedThread');
 
-      const threadTemplate = thread => `
-        <div>${thread.title}</div>
-        <div class="metadata">
-          <div>${thread.author}</div>
-          <div>${convertUnixTimestamp(thread.updatedAt)}</div>
-        </div>
-      `;
+      const CURRENT_THREAD = { id: null };
 
-      const postsCallback = snapshot => {
+      const posts_ref = null;
+      const loadThreadAndPosts = thread => {
+        threads.classList.add('hidden');
+        threadAndPosts.classList.remove('hidden');
+        
+        expandedThread.innerHTML = `
+          <div>${thread.title}</div>
+          <div class="metadata">
+            <div>${thread.author}</div>
+            <div>${convertUnixTimestamp(thread.createdAt)}</div>
+          </div>
+        `;
+        
+        CURRENT_THREAD.id = thread.id
+        db.ref('posts').orderByChild('threadID').equalTo(thread.id).on('value', snapshot => {
           posts.innerHTML = '';
 
           let sortedPosts = Object.values(snapshot.val() || []).sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
@@ -108,19 +123,7 @@
             `;
             posts.append(postElement);
           });
-        }
-
-      const CURRENT_THREAD = { id: null };
-
-      const posts_ref = null;
-      const loadThreadAndPosts = thread => {
-        threads.classList.add('hidden');
-        threadAndPosts.classList.remove('hidden');
-        
-        expandedThread.innerHTML = threadTemplate(thread);
-        
-        CURRENT_THREAD.id = thread.id
-        db.ref('posts').orderByChild('threadID').equalTo(thread.id).on('value', postsCallback);
+        });
       };
 
       db.ref('threads').on('value', snaspshot => {
@@ -131,7 +134,12 @@
         sortedThreads.forEach(thread => {
           let threadElement = document.createElement('div');
           threadElement.classList.add('thread');
-          threadElement.innerHTML = threadTemplate(thread);
+          threadElement.innerHTML = `
+            <div>${thread.title}</div>
+            <div class="metadata">
+              <div>${convertUnixTimestamp(thread.updatedAt)}</div>
+            </div>
+          `;
           threadElement.addEventListener('click', () => loadThreadAndPosts(thread));
           threadList.append(threadElement);
         });
@@ -141,16 +149,27 @@
         let title = titleInput.value.trim();
 
         if (!title) {
-          alert('Thread Title can\'t be blank!');
+          threadError.classList.remove('hidden');
+          threadError.innerText = 'Thread title empty!';
           return;
-        }
+        } 
 
         const threadID = Math.random().toString().substring(2);
+        const timestamp = (new Date()).getTime();
+        
         db.ref(`threads/${threadID}`).set({
           title: title,
           id: threadID, 
           author: authorInput.value.trim() || 'anonymous',
-          updatedAt: (new Date()).getTime(),
+          updatedAt: timestamp,
+          createdAt: timestamp
+        }).then(() => {
+          threadError.classList.add('hidden');
+          threadError.innerText = '';
+        })
+        .catch(() => {
+          threadError.classList.remove('hidden');
+          threadError.innerText = 'Failed to create thread!';
         });
 
         titleInput.value = "";
@@ -160,16 +179,25 @@
         let post = postInput.value.trim();
 
         if (!post) {
-          alert('Post can\'t be blank!');
+          postError.classList.remove('hidden');
+          postError.innerText = 'Can\'t make a blank post!';
           return;
-        }
+        } 
 
         db.ref(`posts/${Math.random().toString().substring(2)}`).set({
           post: post,
           threadID: CURRENT_THREAD.id,
           poster: posterInput.value.trim() || 'anonymous',
           createdAt: (new Date()).getTime(),
+        }).then(() => {
+          postError.classList.add('hidden');
+          postError.innerText = '';
+        })
+        .catch(() => {
+          postError.classList.remove('hidden');
+          postError.innerText = 'Failed to create post!';
         });
+
         postInput.value = "";
       });
 

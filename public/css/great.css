@@ -2,7 +2,6 @@ body {
     font-family: fantasy;
     background-image: url("../assets/great_background.png");
     padding: 0.5rem;
-    opacity: 0.8;
 }
 
 header {
@@ -13,6 +12,7 @@ header {
     margin: 1rem 0 2rem 0;
     padding: 2rem;
     text-align: center;
+    opacity: 0.95;
 }
 
 .createBlock {
@@ -67,4 +67,10 @@ header {
 .threadReturn {    
     display: flex;
     justify-content: space-around;
+}
+
+.errorMessage {
+    color: red;
+    font-size: small;
+    margin-top: 0.5rem;
 }
