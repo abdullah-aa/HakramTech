@@ -3,4 +3,6 @@
 .vscode/
 .firebase/
 .DS_Store
+node_modules/
 firebase-debug.log
+package-lock.json
