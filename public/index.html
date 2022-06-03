@@ -48,6 +48,9 @@
           <button id="postSubmit">Post</button>
         </div>
       </div>
+      <div class="threadReturn">
+        <button id="backToThreads">Browse Threads</button>
+      </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -96,21 +99,7 @@
         </div>
       `;
 
-      const CURRENT_THREAD = { id: null, posts_ref: null, posts_callback: null };
-
-      const posts_ref = null;
-      const loadThreadAndPosts = thread => {
-        threads.classList.add('hidden');
-        threadAndPosts.classList.remove('hidden');
-        
-        expandedThread.innerHTML = threadTemplate(thread);
-
-        if (CURRENT_THREAD.posts_ref) {
-          CURRENT_THREAD.posts_ref.off('value', CURRENT_THREAD.posts_callback)
-        }
-        
-        CURRENT_THREAD.id = thread.id
-        CURRENT_THREAD.posts_callback = snapshot => {
+      const postsCallback = snapshot => {
           posts.innerHTML = '';
 
           let sortedPosts = Object.values(snapshot.val() || []).sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
@@ -128,11 +117,22 @@
             `;
             posts.append(postElement);
           });
-        };
-        CURRENT_THREAD.posts_ref = db.ref('posts').orderByChild('threadID').equalTo(thread.id).on('value', CURRENT_THREAD.posts_callback);
+        }
+
+      const CURRENT_THREAD = { id: null };
+
+      const posts_ref = null;
+      const loadThreadAndPosts = thread => {
+        threads.classList.add('hidden');
+        threadAndPosts.classList.remove('hidden');
+        
+        expandedThread.innerHTML = threadTemplate(thread);
+        
+        CURRENT_THREAD.id = thread.id
+        db.ref('posts').orderByChild('threadID').equalTo(thread.id).on('value', postsCallback);
       };
 
-      const threads_ref = db.ref('threads').on('value', snaspshot => {
+      db.ref('threads').on('value', snaspshot => {
         let sortedThreads = Object.values(snaspshot.val() || []).sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt));
         if (sortedThreads.length == 0) { return; }
 
@@ -183,6 +183,13 @@
 
         alert("Post submitted!");
         postInput.value = "";
+      });
+
+      document.getElementById('backToThreads').addEventListener('click', () => {
+        threadAndPosts.classList.add('hidden');
+        threads.classList.remove('hidden');
+
+        db.ref('posts').off();
       });
     </script>
   </body>

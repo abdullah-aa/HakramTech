@@ -63,3 +63,8 @@ header {
 .hidden {
     display: none;
 }
+
+.threadReturn {    
+    display: flex;
+    justify-content: space-around;
+}
