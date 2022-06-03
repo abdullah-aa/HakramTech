@@ -10,9 +10,9 @@
   </head>
   <body>
     <header>
-      <h2>🌩️ Alexander's Threads 🌩️</h2>
+      <h2>Alexander's 🌩️ Threads</h2>
       <br>
-      <sub>... they're Great! ⛈️</sub>
+      <sub>...they're Great! ⛈️</sub>
     </header>
 
     <div id="threads">
@@ -30,29 +30,14 @@
     </div>
 
     <div id="threadAndPosts" class="hidden">
-      <div class="thread">
+      <div id="expandedThread" class="thread">
         <div>Full blown essay on a very, very mundane chapter of Alex's long, eventful life.</div>
         <div class="metadata">
           <div>notThatGreat</div>
           <div>on June 01, at 19:23</div>
         </div>
       </div>
-      <div id="posts">
-        <div class="post">
-          <div>Said something back, what was it?</div>
-          <div class="metadata">
-            <div>justAsWorse</div>
-            <div>on June 01, at 20:03</div>
-          </div>
-        </div>
-        <div class="post">
-          <div>And so began a conversation</div>
-          <div class="metadata">
-            <div>notGettingBetter</div>
-            <div>on June 01, at 22:15</div>
-          </div>
-        </div>
-      </div>
+      <div id="posts"></div>
       <div class="createBlock post">
         <div>Create a new post...</div>
         <div class="createControls">
@@ -60,7 +45,7 @@
             <textarea id="post" maxlength="100" placeholder="Max 100 chars."></textarea>
             <input id="poster" type="text" maxlength="23" placeholder="Poster" />
           </div>
-          <button id="threadSubmit">Create</button>
+          <button id="postSubmit">Post</button>
         </div>
       </div>
     </div>
@@ -93,28 +78,71 @@
 
       const titleInput = document.getElementById('title');
       const authorInput = document.getElementById('author');
+      const postInput = document.getElementById('post');
+      const posterInput = document.getElementById('poster');
 
+      const threads = document.getElementById('threads');
       const threadList = document.getElementById('threadList');
-      const threads_ref = db.ref('threads').on('value', snaspshot => {
-        threadList.innerHTML = '';
-        let snaspshot_value = snaspshot.val();
-        if (!snaspshot_value) { return; }
+      
+      const posts = document.getElementById('posts');
+      const threadAndPosts = document.getElementById('threadAndPosts');
+      const expandedThread = document.getElementById('expandedThread');
 
+      const threadTemplate = thread => `
+        <div>${thread.title}</div>
+        <div class="metadata">
+          <div>${thread.author}</div>
+          <div>${convertUnixTimestamp(thread.updatedAt)}</div>
+        </div>
+      `;
 
-        let sortedThreads = Object.values(snaspshot_value).sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt));
-        console.log(snaspshot_value);
-        console.log(sortedThreads);
-        sortedThreads.forEach(thread => {
-          let threadDate = 
-          threadList.innerHTML += `
-            <div class="thread">
-              <div>${thread.title}</div>
+      const CURRENT_THREAD = { id: null, posts_ref: null, posts_callback: null };
+
+      const posts_ref = null;
+      const loadThreadAndPosts = thread => {
+        threads.classList.add('hidden');
+        threadAndPosts.classList.remove('hidden');
+        
+        expandedThread.innerHTML = threadTemplate(thread);
+
+        if (CURRENT_THREAD.posts_ref) {
+          CURRENT_THREAD.posts_ref.off('value', CURRENT_THREAD.posts_callback)
+        }
+        
+        CURRENT_THREAD.id = thread.id
+        CURRENT_THREAD.posts_callback = snapshot => {
+          posts.innerHTML = '';
+
+          let sortedPosts = Object.values(snapshot.val() || []).sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
+          if (sortedPosts.length == 0) { return; }
+
+          sortedPosts.forEach(post => {
+            let postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `
+              <div>${post.post}</div>
               <div class="metadata">
-                <div>${thread.author}</div>
-                <div>${convertUnixTimestamp(thread.updatedAt)}</div>
+                <div>${post.poster}</div>
+                <div>${convertUnixTimestamp(post.createdAt)}</div>
               </div>
-            </div>
-          `;
+            `;
+            posts.append(postElement);
+          });
+        };
+        CURRENT_THREAD.posts_ref = db.ref('posts').orderByChild('threadID').equalTo(thread.id).on('value', CURRENT_THREAD.posts_callback);
+      };
+
+      const threads_ref = db.ref('threads').on('value', snaspshot => {
+        let sortedThreads = Object.values(snaspshot.val() || []).sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt));
+        if (sortedThreads.length == 0) { return; }
+
+        threadList.innerHTML = '';
+        sortedThreads.forEach(thread => {
+          let threadElement = document.createElement('div');
+          threadElement.classList.add('thread');
+          threadElement.innerHTML = threadTemplate(thread);
+          threadElement.addEventListener('click', () => loadThreadAndPosts(thread));
+          threadList.append(threadElement);
         });
       });
 
@@ -126,16 +154,35 @@
           return;
         }
 
-        let threadID = `${Math.random()}`.substring(2)
+        const threadID = Math.random().toString().substring(2);
         db.ref(`threads/${threadID}`).set({
-          id: threadID,
           title: title,
+          id: threadID, 
           author: authorInput.value.trim() || 'anonymous',
           updatedAt: (new Date()).getTime(),
         });
 
         alert("Thread submitted for creation!");
         titleInput.value = "";
+      });
+
+      document.getElementById("postSubmit").addEventListener('click', () => {
+        let post = postInput.value.trim();
+
+        if (!post) {
+          alert('Post can\'t be blank!');
+          return;
+        }
+
+        db.ref(`posts/${Math.random().toString().substring(2)}`).set({
+          post: post,
+          threadID: CURRENT_THREAD.id,
+          poster: posterInput.value.trim() || 'anonymous',
+          createdAt: (new Date()).getTime(),
+        });
+
+        alert("Post submitted!");
+        postInput.value = "";
       });
     </script>
   </body>
