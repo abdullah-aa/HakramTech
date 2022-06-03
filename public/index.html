@@ -57,22 +57,13 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
       const firebaseConfig = {
-        apiKey: "AIzaSyCQGOCnq-0gV5SI2tnJ9tG9U9MNcCDT0C4",
-        authDomain: "hakram-tech.firebaseapp.com",
-        projectId: "hakram-tech",
-        databaseURL: "https://hakram-tech-default-rtdb.firebaseio.com/",
-        storageBucket: "hakram-tech.appspot.com",
-        messagingSenderId: "1012316248903",
-        appId: "1:1012316248903:web:d78971e9efa6a494b58a62",
-        measurementId: "G-MGYPVF5H42"
+        // TODO - Add keys before deployment!
       };
 
       const HUMAN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const convertUnixTimestamp = timestamp => {
         let dateObj = new Date();
-        dateObj.setTime(timestamp);
-        let minutes = dateObj.getMinutes();
-        let updatedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        dateObj.setTime(timestamp);news ? `0${minutes}` : minutes;
         return `on ${HUMAN_MONTHS[dateObj.getMonth() - 1]} ${dateObj.getDate()}, at ${dateObj.getHours()}:${updatedMinutes}`;
       }
 
