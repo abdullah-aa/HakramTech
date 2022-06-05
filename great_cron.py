@@ -55,7 +55,7 @@ elif (type == 'post'):
     threadsResponse = http.request('GET', threadsUrl)
     threadsObject = json.loads(threadsResponse.data.decode('utf-8'))
     if (threadsObject):
-        threads = list(threadsObject)
+        threads = list(threadsObject.values())
 
         for _ in range(int(len(threads)/4)):
             pickedThread = random.sample(threads, 1)[0]
