@@ -28,13 +28,15 @@ exports.posts = functions.https.onRequest(async(request, response) => {
 exports.createPost = functions.https.onRequest(async(request, response) => {
   const threadID = request.query.threadID;
   const postID = Math.random().toString().substring(2);
+  const timestamp = randomizeDate(1)
   functions.logger.info(`Post creation request for ${threadID}`, {structuredData: true});
   admin.database().ref(`posts/${postID}`).set({
     post: request.query.post,
     threadID: threadID,
     poster: request.query.poster || 'anonymous',
-    createdAt: randomizeDate(1),
+    createdAt: timestamp,
   });
+  admin.database().ref(`threads/${threadID}`).update({ updatedAt: timestamp });
   response.json({ id: postID });
 });
 
@@ -50,10 +52,4 @@ exports.createThread = functions.https.onRequest(async(request, response) => {
     createdAt: timestamp
   });
   response.json({ id: threadID });
-});
-
-exports.updateThread = functions.database.ref('posts/{postID}').onCreate((snapshot, context) => {
-  let post = snapshot.val();
-  functions.logger.info(`Thread update request for ${post.threadID} - triggered by ${context.params.postID}`, {structuredData: true});
-  return admin.database().ref(`threads/${post.threadID}`).update({ updatedAt: (new Date()).getTime() });
 });
