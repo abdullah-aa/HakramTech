@@ -39,7 +39,7 @@ def generate_post(seed, threadID):
     post_params = {
         'threadID': threadID,
         'poster': generate_name(),
-        'post': generate_text(seed, 30 + random.sample(range(30), 1)[0])
+        'post': generate_text(seed, 50 + random.sample(range(30), 1)[0])
     }
     http.request('GET', createPostUrl, post_params)
 

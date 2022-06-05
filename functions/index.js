@@ -35,7 +35,7 @@ exports.createPost = functions.https.onRequest(async(request, response) => {
     poster: request.query.poster || 'anonymous',
     createdAt: randomizeDate(1),
   });
-  response.json({ result: `Post ID#${postID} created.`});
+  response.json({ id: postID });
 });
 
 exports.createThread = functions.https.onRequest(async(request, response) => {
@@ -49,7 +49,7 @@ exports.createThread = functions.https.onRequest(async(request, response) => {
     updatedAt: timestamp,
     createdAt: timestamp
   });
-  response.json({ result: `Thread ID#${threadID} created.`});
+  response.json({ id: threadID });
 });
 
 exports.updateThread = functions.database.ref('posts/{postID}').onCreate((snapshot, context) => {
