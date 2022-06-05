@@ -53,18 +53,19 @@ if (type == 'thread'):
     http.request('GET', createThreadUrl, thread_params)
 elif (type == 'post'):
     threadsResponse = http.request('GET', threadsUrl)
-    threads = list(json.loads(threadsResponse.data.decode('utf-8')).values())
-    threadsToPick = math.floor(len(threads) * 0.25)
+    threadsObject = json.loads(threadsResponse.data.decode('utf-8'))
+    if (threadsObject):
+        threads = list(threadsObject)
 
-    for _ in range(threadsToPick):
-        pickedThread = random.sample(threads, 1)[0]
-        posts_params = { 'threadID': pickedThread['id'] }
-        postsResponse = http.request('GET', postsUrl, posts_params)
-        
-        seed = pickedThread['title']
-        postsObject = json.loads(postsResponse.data.decode('utf-8'))
-        if (postsObject):
-            seed += f" #{sorted(list(postsObject.values()), key=lambda x: x['createdAt'])[-1]['post']}"
-        generate_post(seed, pickedThread['id'])
+        for _ in range(int(len(threads)/4)):
+            pickedThread = random.sample(threads, 1)[0]
+            posts_params = { 'threadID': pickedThread['id'] }
+            postsResponse = http.request('GET', postsUrl, posts_params)
+            
+            seed = pickedThread['title']
+            postsObject = json.loads(postsResponse.data.decode('utf-8'))
+            if (postsObject):
+                seed += f" #{sorted(list(postsObject.values()), key=lambda x: x['createdAt'])[-1]['post']}"
+            generate_post(seed, pickedThread['id'])
 
     

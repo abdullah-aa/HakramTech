@@ -68,7 +68,7 @@
         dateObj.setTime(timestamp);
         let minutes = dateObj.getMinutes();
         let updatedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-        return `${dateObj.getHours()}:${updatedMinutes}, on ${HUMAN_MONTHS[dateObj.getMonth() - 1]} ${dateObj.getDate()}`;
+        return `${dateObj.getHours()}:${updatedMinutes}, on ${HUMAN_MONTHS[dateObj.getMonth()]} ${dateObj.getDate()}`;
       }
 
       const firebaseApp = firebase.initializeApp(firebaseConfig);
