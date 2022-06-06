@@ -69,7 +69,9 @@ elif (type == 'post'):
             seed = pickedThread['title']
             postsObject = json.loads(postsResponse.data.decode('utf-8'))
             if (postsObject):
-                seed += f" #{sorted(list(postsObject.values()), key=lambda x: x['createdAt'])[-1]['post']}"
+                latestPost = sorted(list(postsObject.values()), key=lambda x: x['createdAt'])[-1]
+                seed += f" {latestPost['post']}"
+
             generate_post(seed, pickedThread['id'])
 
     
