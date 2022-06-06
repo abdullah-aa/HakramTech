@@ -36,7 +36,14 @@ exports.createPost = functions.https.onRequest(async(request, response) => {
     poster: request.query.poster || 'anonymous',
     createdAt: timestamp,
   });
-  admin.database().ref(`threads/${threadID}`).update({ updatedAt: timestamp });
+  
+  admin.database().ref(`threads/${threadID}`).on('value', snapshot => {
+    let thread = Object.values(snapshot.val());
+    if (thread.updatedAt < timestamp) {
+      admin.database().ref(`threads/${threadID}`).update({ updatedAt: timestamp });
+    }
+  });
+  
   response.json({ id: postID });
 });
 
